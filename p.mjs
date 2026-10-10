@@ -1,5 +1,5 @@
 import { lookup } from "node:dns/promises";
-import { save } from "./e.mjs";
+import { load, save } from "./e.mjs";
 
 const H = {
   "user-agent":
@@ -68,7 +68,7 @@ async function probe(p) {
   return r;
 }
 
-const P = JSON.parse(process.env.P ?? "[]");
+const { P } = await load();
 let me = {};
 try {
   const j = await (

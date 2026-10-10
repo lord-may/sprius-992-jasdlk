@@ -6,3 +6,5 @@ o/
 d/
 *.zip
 b.json
+i.json
+mk.mjs

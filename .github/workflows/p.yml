@@ -9,22 +9,19 @@ permissions:
 jobs:
   p:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
-      S: ${{ secrets.S }}
-      B: ${{ secrets.B }}
       K: ${{ secrets.K }}
     steps:
       - uses: actions/checkout@v5
-      - run: node p.mjs
-        env:
-          P: ${{ secrets.P }}
-      - if: ${{ !cancelled() && env.S != '' }}
-        run: node r.mjs
-      - if: ${{ !cancelled() && env.B != '' }}
+      - run: node --version && node p.mjs
+      - if: ${{ !cancelled() }}
+        run: node s.mjs
+      - if: ${{ !cancelled() }}
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - if: ${{ !cancelled() && env.B != '' }}
+      - if: ${{ !cancelled() }}
         run: node b.mjs
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
