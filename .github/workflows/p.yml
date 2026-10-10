@@ -1,0 +1,28 @@
+name: p
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    env:
+      S: ${{ secrets.S }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: node p.mjs
+        env:
+          P: ${{ secrets.P }}
+          K: ${{ secrets.K }}
+      - if: ${{ !cancelled() && env.S != '' }}
+        run: node r.mjs
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: p
+          path: o/p.enc
+          if-no-files-found: ignore
+          retention-days: 7
