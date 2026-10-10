@@ -79,7 +79,7 @@ async function probe(p) {
       hint: W.exec(b.slice(0, 20000).toLowerCase())?.[0] ?? "",
       final: x.url,
       headers: Object.fromEntries(x.headers),
-      body: b.slice(0, 4000),
+      body: b.slice(0, 500000),
     });
   } catch (e) {
     Object.assign(r, { status: "fail", ms: Date.now() - t, error: why(e) });
