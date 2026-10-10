@@ -1,6 +1,5 @@
-import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { lookup } from "node:dns/promises";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { save } from "./e.mjs";
 
 const H = {
   "user-agent":
@@ -13,24 +12,6 @@ const H = {
 };
 const W =
   /captcha|incapsula|access denied|request is blocked|could not be satisfied|attention required|just a moment|site blocked|forbidden|not available in your/;
-
-const key = () => Buffer.from(process.env.K ?? "", "hex");
-const seal = (b) => {
-  const v = randomBytes(12);
-  const c = createCipheriv("aes-256-gcm", key(), v);
-  const x = Buffer.concat([c.update(b), c.final()]);
-  return Buffer.concat([v, c.getAuthTag(), x]);
-};
-const open = (b) => {
-  const c = createDecipheriv("aes-256-gcm", key(), b.subarray(0, 12));
-  c.setAuthTag(b.subarray(12, 28));
-  return Buffer.concat([c.update(b.subarray(28)), c.final()]);
-};
-
-if (process.argv[2] === "d") {
-  process.stdout.write(open(await readFile(process.argv[3])));
-  process.exit();
-}
 
 const why = (e) => {
   const c = e?.cause?.code ?? e?.code ?? "";
@@ -117,11 +98,8 @@ R.forEach((r, i) =>
   ),
 );
 
-const out = JSON.stringify(
-  { at: new Date().toISOString(), runner: me, r: R.map((r, i) => ({ ...P[i], ...r })) },
-  null,
-  1,
-);
-await mkdir("o", { recursive: true });
-if (!process.env.CI) await writeFile("o/p.json", out);
-else if (key().length === 32) await writeFile("o/p.enc", seal(Buffer.from(out)));
+await save("p", {
+  at: new Date().toISOString(),
+  runner: me,
+  r: R.map((r, i) => ({ ...P[i], ...r })),
+});

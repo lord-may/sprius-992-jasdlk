@@ -11,18 +11,25 @@ jobs:
     runs-on: ubuntu-latest
     env:
       S: ${{ secrets.S }}
+      B: ${{ secrets.B }}
+      K: ${{ secrets.K }}
     steps:
       - uses: actions/checkout@v5
       - run: node p.mjs
         env:
           P: ${{ secrets.P }}
-          K: ${{ secrets.K }}
       - if: ${{ !cancelled() && env.S != '' }}
         run: node r.mjs
+      - if: ${{ !cancelled() && env.B != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - if: ${{ !cancelled() && env.B != '' }}
+        run: node b.mjs
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: p
-          path: o/p.enc
+          path: o/*.enc
           if-no-files-found: ignore
           retention-days: 7
