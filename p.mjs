@@ -80,7 +80,18 @@ try {
 }
 console.log(`runner ${JSON.stringify(me)}`);
 
-const R = await Promise.all(P.map(probe));
+// 8 at a time: 142 at once starved DNS (libuv's 4 threads) and every probe
+// hit the 10 s connect timeout, even ones that always answer.
+const R = new Array(P.length);
+let next = 0;
+await Promise.all(
+  Array.from({ length: 8 }, async () => {
+    while (next < P.length) {
+      const j = next++;
+      R[j] = await probe(P[j]);
+    }
+  }),
+);
 R.forEach((r, i) =>
   console.log(
     [
